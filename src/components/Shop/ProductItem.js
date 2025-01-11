@@ -5,10 +5,14 @@ import { cartSliceActions } from '../../store/cart';
 
 const ProductItem = (props) => {
   const dispatch = useDispatch();
-  const { title, price, description } = props;
+  const { title, price, description, id } = props;
 
   const handleAddItem = () =>{
-    dispatch(cartSliceActions.addItem());
+    dispatch(cartSliceActions.addItem({
+      id,
+      title,
+      price
+    }));
   }
 
   return (
