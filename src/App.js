@@ -2,36 +2,43 @@ import { useEffect } from 'react';
 import Cart from './components/Cart/Cart';
 import Layout from './components/Layout/Layout';
 import Products from './components/Shop/Products';
-import { useSelector } from 'react-redux';
+import Notification from './components/UI/Notification';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchData, sendData } from './store/cart-actions';
+
+let isInitial = true;
 
 function App() {
   const showCart = useSelector(state => state.ui.cartOpened);
   const cart = useSelector(state => state.cart.items);
-
+  const notification = useSelector(state => state.ui.notification);
+  const dispatch = useDispatch();
   useEffect(() =>{
-    const fetchCartItems = async () =>{
-      try{
-        const response = await fetch("https://react-http-3f0d9-default-rtdb.firebaseio.com/cart.json", {
-                method: "PUT",
-                body: JSON.stringify(cart)
-              });
-
-        if(!response.ok){
-        throw new Error("Something went wrong! Cannot fetch data.");
-      }
-      }
-      catch(error){
-        //error
-      }
+    dispatch(fetchData());
+  });
+  useEffect(() =>{
+    if(isInitial){
+      isInitial = false;
+      return;
     }
-    fetchCartItems();
-  },[cart]);
+    dispatch(sendData(cart));
+  },[cart, dispatch]);
 
   return (
-    <Layout>
-      {showCart && <Cart />}
-      <Products />
-    </Layout>
+    <>
+      {
+        notification &&
+         <Notification
+          status={notification.status}
+          title={notification.title}
+          message={notification.message}
+          />
+      }
+      <Layout>
+        {showCart && <Cart />}
+        <Products />
+      </Layout>
+    </>
   );
 }
 
